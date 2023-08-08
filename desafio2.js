@@ -1,10 +1,34 @@
-import {promises as fs} from 'fs'
+import {promises as fs} from 'fs';
+
+class Product {
+    constructor(title, description, price, thumbnail, code, stock) {
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.thumbnail = thumbnail;
+        this.code = code;
+        this.stock = stock;
+        this.id = Product.incrementID()
+
+    }
+
+    static incrementID() {
+        this.idIncrement = this.idIncrement ? this.idIncrement + 1 : 1
+        return this.idIncrement
+    }
+}
+class ProductManager {
+    constructor() {
+        this.path = './productos.txt'
+    }
 
 
-const addProduct = async (product) => {
+
+//Add Product function
+addProduct = async (product) => {
 
     //Consulto el txt y lo parseo
-    const products = JSON.parse(await fs.readFile('./productos.txt','utf-8'))
+    const products = JSON.parse(await fs.readFile(this.path,'utf-8'))
     console.log(products)
 
     //Consulto si mi producto ya existe en mi txt
@@ -12,62 +36,84 @@ const addProduct = async (product) => {
         return "Producto ya agregado"
     }
 
-    //Lo agrego al array
-    products.push(product)
+    else{ //Lo agrego al array
+        products.push(product)
+    }
 
     //Parseo y guardo el array modificado
-    await fs.writeFile('./productos.txt', JSON.stringify(products))
+    await fs.writeFile(this.path, JSON.stringify(products))
 
 }
 
-const getProducts = async () => {
-    const products = JSON.parse(await fs.readFile('./productos.txt','utf-8'))
+//Get Products function
+getProducts = async () => {
+    const products = JSON.parse(await fs.readFile(this.path,'utf-8'))
     console.log(products)
 }
 
-const getProductById = async (id) => {
-    const products = JSON.parse(await fs.readFile('./productos.txt','utf-8'))
+//Get Product By ID function
+getProductById = async (id) => {
+    const products = JSON.parse(await fs.readFile(this.path,'utf-8'))
     const prod = products.find(producto => producto.id === id)
     if (prod) {
         console.log(prod)
     } else {
-        console.log("Producto no existe")
+        console.log("Producto no encontrado")
     }
 }
 
-
-const updateProduct = async (id, {nombre}) => {
-    const products = JSON.parse(await fs.readFile('./productos.txt','utf-8'))
+//Update Product function
+updateProduct = async (id, {title, description, price, thumbnail,code, stock}) => {
+    const products = JSON.parse(await fs.readFile(this.path,'utf-8'))
     const indice = products.findIndex(prod => prod.id === id)
 
-    if(indice != -1){
+    if(indice != -1) {
         //Modifico todos los atributos presentes de mi objeto mediante el indice
-        products[indice].nombre = nombre
-        await fs.writeFile('./productos.txt', JSON.stringify(products))
+        products[indice]
+        .title = title
+        .description = description
+        .price = price
+        .image = image
+        .thumbnail = thumbnail
+        .code = code
+        .stock = stock
+        await fs.writeFile(this.path, JSON.stringify(products))
 
     }else {
         console.log("Producto no encontrado")
     }
 
-
 }
 
-const deleteProduct = async (id) => {
-    const products = JSON.parse(await fs.readFile('./productos.txt','utf-8'))
-    // Traeme todos los productos cuyo id sea distinto del id ingresado
+//Delete Product function
+deleteProduct = async (id) => {
+    const products = JSON.parse(await fs.readFile(this.path,'utf-8'))
+    // Trae todos los productos cuyo id sea distinto del id ingresado
     const prods = products.filter(prod => prod.id != id)
-    //Ese array modificamelo
-    await fs.writeFile('./productos.txt', JSON.stringify(products))
+    //Modifica el array
+    await fs.writeFile(this.path, JSON.stringify(products))
 
 }
+}
 
+const product1= new Product("Cartera","Mini-bag negra con tachas", 30.000,"imagen no disponible","C5", 10)
+const product2= new Product("Reloj","Tactil color silver", 15.000,"imagen no disponible","R4",20)
+const product3= new Product("Pulsera","Con strass color gold",10.000,"imagen no disponible","P6",30)
 
-//addProduct({ nombre: "Bufanda", id: 4})
+const productManager = new ProductManager()
 
-//getProducts()
+productManager.getProducts()
 
-//getProductById(2)
+//productManager.addProduct(product1)
+//productManager.addProduct(product2)
+//productManager.addProduct(product3)
 
-//updateProduct (1, {nombre: "Bufanda"})
+//productManager.getProducts()
 
-//deleteProduct(3)
+//productManager.getProductById(1)
+//productManager.getProductById(2)
+//productManager.getProductById(3)
+
+//productManager.updateProduct (1, {title: "Bufanda"})
+
+//productManager.deleteProduct(3)
