@@ -7,7 +7,7 @@
     "moment": "^2.29.4"
   },
   "scripts": {
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/main.js"
   },
   "repository": {
     "type": "git",
