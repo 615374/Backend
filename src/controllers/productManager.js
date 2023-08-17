@@ -38,14 +38,10 @@ export class ProductManager {
 
  //Get Product By ID function
  async getProductById(id) {
- const products = JSON.parse(await fs.readFile(this.path,'utf-8'))
-    const prod = products.find(producto => producto.id === id)
-    if (prod) {
-        return true
-    } else {
-        return false
-    }
- }
+    const products = JSON.parse(await fs.readFile(this.path,'utf-8'))
+    return products.find(producto => producto.id === id)
+
+}    
 
  //Update Product function
  async updateProduct (id, {title, description, price, thumbnail,code, stock}) {
