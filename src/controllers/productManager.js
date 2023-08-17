@@ -16,7 +16,7 @@ export class ProductManager {
 
     //Consulto si mi producto ya existe en mi txt
     if(products.find(producto => producto.code == product.code)){
-        return "Producto ya existente"
+        return false // si existe no lo agrega
     }
 
     else{ //Lo agrego al array
@@ -24,7 +24,7 @@ export class ProductManager {
         products.push(product)
         //Parseo y guardo el array modificado
         await fs.writeFile(this.path, JSON.stringify(products))
-        return products
+        return true // si no existe lo agrega
     }
    
 
@@ -33,7 +33,7 @@ export class ProductManager {
  //Get Products function
  async getProducts() {
     const products = JSON.parse(await fs.readFile(this.path,'utf-8'))
-    console.log(products)
+    return products
  }
 
  //Get Product By ID function
@@ -41,9 +41,9 @@ export class ProductManager {
  const products = JSON.parse(await fs.readFile(this.path,'utf-8'))
     const prod = products.find(producto => producto.id === id)
     if (prod) {
-        console.log(prod)
+        return true
     } else {
-        console.log("Producto no encontrado")
+        return false
     }
  }
 
@@ -63,9 +63,10 @@ export class ProductManager {
         products[indice].stock = stock
 
         await fs.writeFile(this.path, JSON.stringify(products))
+        return true
 
     }else {
-        console.log("Producto no encontrado")
+        return false
     }
 
  }
@@ -76,13 +77,14 @@ export class ProductManager {
     // Trae todos los productos cuyo id sea distinto del id ingresado
     const prod = products.find(item => item.id === id)
     if (!prod) {
-        console.log ("Producto no encontrado")
+        return false
     }
     
     const prods = products.filter(prod => prod.id != id)
     products = prods;
     //Modifica el array
     await fs.writeFile(this.path, JSON.stringify(products))
+    return true
 
  }
 }
@@ -113,7 +115,7 @@ const product3= new Product("Pulsera","Con strass color gold",10.000,"imagen no 
 const productManager = new ProductManager
 
 productManager.getProducts()
-productManager.addProduct(product1)
+//productManager.addProduct(product1)
 //productManager.addProduct(product2)
 //productManager.addProduct(product3)
 
