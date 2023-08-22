@@ -37,7 +37,8 @@ app.use('/api/product',routerProd)
 app.get('/static', (req, res) => {
     // Indica que plantilla voy a utilizar
     res.render("home", {
-        nombreUsuario: "Gisela"
+        title: "Home",
+        userName: "Gisela"
 
     })
 })

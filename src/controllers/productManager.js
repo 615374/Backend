@@ -2,7 +2,7 @@ import {promises as fs} from 'fs';
 
 export class ProductManager {
     constructor() {
-        this.path = 'src/models/productos.json'
+        this.path = 'src/models/products.json'
     }
 
 

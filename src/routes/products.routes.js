@@ -3,7 +3,7 @@ import {ProductManager} from '../controllers/productManager.js'
 
 
 const routerProd = Router()
-const productManager = new ProductManager('src/models/productos.json');
+const productManager = new ProductManager('src/models/products.json');
 
 routerProd.get('/', async(req, res) => {
     const {limit} = req.query
