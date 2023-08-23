@@ -3,12 +3,20 @@ import multer from 'multer'
 import {engine} from 'express-handlebars'
 import routerProd from './routes/products.routes.js'
 import {__dirname} from './path.js'
+import {Server} from 'socket.io'
 import path from 'path'
 
 
 
 const PORT = 4000
 const app = express()
+
+//Server
+const server = app.listen(PORT, () => {
+    console.log(`Server on port ${PORT}`)
+})
+
+const io = new Server(server)
 
 //Config
 const storage = multer.diskStorage({
@@ -30,6 +38,19 @@ app.set('view engine', 'handlebars')
 app.set('views', path.resolve(__dirname, './views'))
 
 const upload = multer({storage: storage})
+const mensajes = []
+
+//Conexion de Socket.io
+io.on("connection", (socket) => {
+    console.log("Conexion con Socket.io")
+
+    socket.on('mensaje', info => {
+        console.log(info)
+        socket.emmit('respuesta', "Hola usuario, conexion establecida")
+       
+    })
+
+})
 
 //Routes
 app.use('/static', express.static(__dirname + '/public'))
@@ -48,8 +69,5 @@ app.post('/upload', upload.single('product'), (req,res) =>{
 
 })
 
-//Server
-app.listen(PORT, () => {
-    console.log(`Server on port ${PORT}`)
-})
+
 
