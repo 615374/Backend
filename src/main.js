@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
 
     socket.on('mensaje', info => {
         console.log(info)
-        socket.emmit('respuesta', "Hola usuario, conexion establecida")
+        socket.emit('respuesta', "Hola usuario, conexion establecida")
        
     })
 
