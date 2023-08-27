@@ -57,10 +57,10 @@ app.use('/static', express.static(__dirname + '/public'))
 app.use('/api/product',routerProd)
 app.get('/static', (req, res) => {
     // Indica que plantilla voy a utilizar
-    res.render("home", {
-        title: "Home",
-        userName: "Gisela"
-
+   
+    res.render("realTimeProducts", {
+        rutaCSS: "realTimeProducts",
+        rutaJS: "realTimeProducts",
     })
 })
 app.post('/upload', upload.single('product'), (req,res) =>{
@@ -68,6 +68,7 @@ app.post('/upload', upload.single('product'), (req,res) =>{
     console.log(req.body)
 
 })
+
 
 
 
