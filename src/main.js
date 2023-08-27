@@ -44,13 +44,22 @@ const mensajes = []
 io.on("connection", (socket) => {
     console.log("Conexion con Socket.io")
 
-    socket.on('mensaje', info => {
+    /*socket.on('mensaje', info => {
         console.log(info)
         socket.emit('respuesta', "Hola usuario, conexion establecida")
        
+    })*/
+
+    socket.on('nuevoProducto', (prod) => {
+        console.log(prod)
+        //Deberia agregarse al txt o json mediante addProduct
+        socket.emit("mensajeProductoCreado", "El producto se creo correctamente")
     })
 
+
 })
+
+
 
 //Routes
 app.use('/static', express.static(__dirname + '/public'))
