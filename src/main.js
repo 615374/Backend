@@ -2,6 +2,7 @@ import express from 'express'
 import multer from 'multer'
 import {engine} from 'express-handlebars'
 import routerProd from './routes/products.routes.js'
+import routerCart from './routes/cart.routes.js'
 import {__dirname} from './path.js'
 import {Server} from 'socket.io'
 import path from 'path'
@@ -33,6 +34,7 @@ const storage = multer.diskStorage({
 //Middlewares
 app.use(express.json())
 app.use(express.urlencoded({extended: true}));
+
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.set('views', path.resolve(__dirname, './views'))
@@ -64,13 +66,22 @@ io.on("connection", (socket) => {
 //Routes
 app.use('/static', express.static(__dirname + '/public'))
 app.use('/api/product',routerProd)
+app.use('/api/carts', routerCart);
+
 app.get('/static', (req, res) => {
     // Indica que plantilla voy a utilizar
    
-    res.render("realTimeProducts", {
+    /*res.render("realTimeProducts", {
         rutaCSS: "realTimeProducts",
         rutaJS: "realTimeProducts",
+    })*/
+
+    res.render ('chat', {
+        rutaJS: "chat"
     })
+
+
+
 })
 app.post('/upload', upload.single('product'), (req,res) =>{
     console.log(req.file)
