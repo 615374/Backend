@@ -1,6 +1,6 @@
 const socket = io()
 
-const botonChat = documen.getElementById('botonChat')
+const botonChat = document.getElementById('botonChat')
 const parrafosMensajes = document.getElementById('parrafosMensajes')
 const valInput = document.getElementById('chatBox')
 let user 

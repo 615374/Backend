@@ -1,29 +1,29 @@
 import {Router} from "express";
 import {userModel} from "../models/users.model.js"
 
-const userRouter = Router()
+const routerUser = Router()
 
-userRouter.get('/', async(req,res) =>{
+routerUser.get('/', async(req,res) =>{
     try{
-        const users = await userModel.find()
-        res.status(200).send(users)
-    } catch(e){
-        res.status(400).send("Error al consultar users: ", error)
+        const users = await userModel.find();
+        res.status(200).send({resultado: 'OK', message: users})
+    } catch(error){
+        res.status(400).send({error: `Error al consultar usuario: ${error}`})
 
     }
 })
 
-userRouter.post('/', async(req,res)=> {
+routerUser.post('/', async(req,res)=> {
     try{
         const {nombre, apellido, edad, password, email} = req.body
-        const resultado = await userModel.create({
+        const respuesta = await userModel.create({
             nombre, apellido, edad, password, email
         })
-        res.status(200).send(resultado)
+        res.status(200).send({resultado: 'OK', message: respuesta})
     } catch(error){
-        res.status(400).send("Error al crear usuario: ", error)
+        res.status(400).send({error: `Error al crear usuario: ${error}`})
 
     }
 })
 
-export default userRouter
+export default routerUser

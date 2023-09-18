@@ -1,32 +1,25 @@
-import { Router } from 'express';
-import { CartManager } from '../controllers/cartManager.js';
+import {Router} from 'express';
+import cartModel from '../models/carts.models.js';
+
 
 const routerCart = Router();
-const cartManager = new CartManager('./src/models/carts.json', './src/models/products.json');
 
-routerCart.get('/:cid', async (req, res) => {
-	const { cid } = req.params;
-	const products = await cartManager.getProductsFromCart(parseInt(cid));
-	if (products)
-    res.status(200).send(products)
+//implementacion con MONGODB
 
-    else
-    res.status(400).send("Carrito inexistente")
-});
+routerCart.post('/:cid/products/:pid', async (req, res) => {
+    const { cid, pid } = req.params
+    const { quantity } = req.body
+    try {
+        const cart = await cartModel.findById(cid)
+        if (cart) {
+            cart.products.push({ id_prod: pid, quantity: quantity })
+            const respuesta = await cartModel.findByIdAndUpdate(cid, cart) //Actualizo el carrito de mi BDD con el nuevo producto
+            res.status(200).send({ respuesta: 'OK', mensaje: respuesta })
+        }
+    } catch (e) {
+        res.status(400).send({ error: e })
+    }
+})
 
-routerCart.post('/', async (req, res) => {
-	await cartManager.createCart();
-	res.status(200).send('Carrito creado correctamente');
-});
+export default routerCart
 
-routerCart.post('/:cid/product/:pid', async (req, res) => {
-	const { cid, pid } = req.params;
-	const confirmacion = await cartManager.addProductToCart(parseInt(cid), parseInt(pid));
-	if (confirmacion)
-    res.status(200).send("Producto agregado correctamente")
-
-    else
-    res.status(400).send("Producto o carrito inexistente")
-});
-
-export default routerCart;

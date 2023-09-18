@@ -11,6 +11,6 @@ const messageSchema = new Schema({
     }
 })
 
-const messageModel = model('messsages', messageSchema)
+const messageModel = model('messages', messageSchema)
 
 export default messageModel

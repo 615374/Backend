@@ -1,20 +1,22 @@
-import express from 'express'
-import multer from 'multer'
-import mongoose from 'mongoose'
-import {engine} from 'express-handlebars'
+import express from 'express';
+import multer from 'multer';
+import {engine} from 'express-handlebars';
+import {Server} from 'socket.io';
+import {__dirname} from './path.js'
+import path from 'path'
+import mongoose from 'mongoose';
+
+
 import routerProd from './routes/products.routes.js'
 import routerCart from './routes/cart.routes.js'
-import userRouter from './routes/user.routes.js'
-import {__dirname} from './path.js'
-import {Server} from 'socket.io'
-import path from 'path'
-import { ProductManager } from './controllers/productManager.js'
+import routerUser from './routes/user.routes.js'
+import productModel from './models/products.models.js'
+import routerMessage from './routes/messages.routes.js';
 
 
 
-
-const PORT = 4000
 const app = express()
+const PORT = 4000
 
 mongoose.connect(`mongodb+srv://615374:615374nz@cluster0.svwyk4t.mongodb.net/?retryWrites=true&w=majority`)
 .then(() =>  console.log("DB conectada")) 
@@ -28,7 +30,12 @@ const server = app.listen(PORT, () => {
 
 const io = new Server(server)
 
-//Config
+/*//Config
+
+
+const upload = multer({storage: storage})
+const mensajes = []
+
 const storage = multer.diskStorage({
     destination : (req, file, cb) => { //cb = callback
         cb(null, 'src/public/img')
@@ -37,12 +44,15 @@ const storage = multer.diskStorage({
     filename: (req,file,cb) => {
         cb(null, `${Date.now()}${file.originalname}`) //concateno la fecha actual con el nombre del archivo
     }
-})
+}) */
 
 
 //Middlewares
 app.use(express.json())
 app.use(express.urlencoded({extended: true}));
+app.engine('handlebars', engine())
+app.set('view engine', 'handlebars')
+app.set('views', path.resolve(__dirname, './views'))
 /*app.use(cookieParser(process.env.SIGNED_COOKIE))
 app.use(session({
     secret: process.env.SIGNED_COOKIE,
@@ -51,12 +61,6 @@ app.use(session({
 }))
 
 */
-app.engine('handlebars', engine())
-app.set('view engine', 'handlebars')
-app.set('views', path.resolve(__dirname, './views'))
-
-const upload = multer({storage: storage})
-const mensajes = []
 
 //Conexion de Socket.io
 io.on("connection", (socket) => {
@@ -68,9 +72,9 @@ io.on("connection", (socket) => {
        
     })*/
 
-    socket.on('nuevoProducto', async (prod) => {
+    socket.on('load', async () => {
         //Deberia agregarse al txt o json mediante addProduct
-        const confirmacion = await productManager.addProduct(prod)
+        const data = await productModel.paginate({}, {limit: 5});
         if (confirmacion)
             socket.emit("mensajeProductoCreado", "El producto se creo correctamente")
         else
@@ -84,9 +88,10 @@ io.on("connection", (socket) => {
 
 //Routes
 app.use('/static', express.static(__dirname + '/public'))
-app.use('/api/product',routerProd)
+app.use('/api/products',routerProd)
 app.use('/api/carts', routerCart);
-app.use('/api/users', userRouter)
+app.use('/api/messages', routerMessage)
+app.use('/api/users', routerUser)
 
 app.get('/static', (req, res) => {
     // Indica que plantilla voy a utilizar
@@ -96,14 +101,16 @@ app.get('/static', (req, res) => {
         rutaJS: "realTimeProducts",
     })*/
 
-    res.render ('chat', {
-        rutaJS: "chat"
+    res.render ("chat", {
+        rutaJS: "chat",
+        rutaCSS:"style"
     })
 
 
 
 })
-app.post('/upload', upload.single('product'), (req,res) =>{
+
+/*app.post('/upload', upload.single('product'), (req,res) =>{
     console.log(req.file)
     console.log(req.body)
 
@@ -125,7 +132,7 @@ app.get('/getCookie', (req, res)=>{
 
 //Sessions
 
-app.get('/session', (req, res) =>{
+/*app.get('/session', (req, res) =>{
     if(req.session.counter){
         req.session.counter++
         res.send(`Has entrado ${req.session.counter}`)
@@ -136,3 +143,4 @@ app.get('/logout', (req,res) =>{
     req.session.destroy((error)=>{})
 })
 
+*/
