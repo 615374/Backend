@@ -15,9 +15,9 @@ routerUser.get('/', async(req,res) =>{
 
 routerUser.post('/', async(req,res)=> {
     try{
-        const {nombre, apellido, edad, password, email} = req.body
+        const {nombre, apellido, email, password} = req.body
         const respuesta = await userModel.create({
-            nombre, apellido, edad, password, email
+            nombre, apellido, email, password
         })
         res.status(200).send({resultado: 'OK', message: respuesta})
     } catch(error){

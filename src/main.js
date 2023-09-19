@@ -9,8 +9,7 @@ import mongoose from 'mongoose';
 
 import routerProd from './routes/products.routes.js'
 import routerCart from './routes/cart.routes.js'
-import routerUser from './routes/user.routes.js'
-import productModel from './models/products.models.js'
+import routerUser from './routes/users.routes.js'
 import routerMessage from './routes/messages.routes.js';
 
 
@@ -18,7 +17,7 @@ import routerMessage from './routes/messages.routes.js';
 const app = express()
 const PORT = 4000
 
-mongoose.connect(`mongodb+srv://615374:615374nz@cluster0.svwyk4t.mongodb.net/?retryWrites=true&w=majority`)
+mongoose.connect('mongodb+srv://615374:615374nz@615374.ohouqzx.mongodb.net/?retryWrites=true&w=majority')
 .then(() =>  console.log("DB conectada")) 
 .catch((error) => console.log("Error en conexion a MongoDB Atlas: ", error))
 
@@ -30,11 +29,7 @@ const server = app.listen(PORT, () => {
 
 const io = new Server(server)
 
-/*//Config
-
-
-const upload = multer({storage: storage})
-const mensajes = []
+//Config
 
 const storage = multer.diskStorage({
     destination : (req, file, cb) => { //cb = callback
@@ -44,7 +39,7 @@ const storage = multer.diskStorage({
     filename: (req,file,cb) => {
         cb(null, `${Date.now()}${file.originalname}`) //concateno la fecha actual con el nombre del archivo
     }
-}) */
+}) 
 
 
 //Middlewares
@@ -62,24 +57,28 @@ app.use(session({
 
 */
 
+const upload = multer ({storage: storage})
+const mensajes = []
+
 //Conexion de Socket.io
 io.on("connection", (socket) => {
     console.log("Conexion con Socket.io")
 
-    /*socket.on('mensaje', info => {
+    socket.on('mensaje', info => {
         console.log(info)
-        socket.emit('respuesta', "Hola usuario, conexion establecida")
+        mensajes.push(info)
+        io.emit('mensajes', mensajes)
        
-    })*/
+    })
 
-    socket.on('load', async () => {
+   /* socket.on('load', async () => {
         //Deberia agregarse al txt o json mediante addProduct
         const data = await productModel.paginate({}, {limit: 5});
         if (confirmacion)
             socket.emit("mensajeProductoCreado", "El producto se creo correctamente")
         else
             socket.emit("mensajeProductoCreado","El producto ya existe")
-    })
+    })*/
 
 
 })
@@ -89,7 +88,7 @@ io.on("connection", (socket) => {
 //Routes
 app.use('/static', express.static(__dirname + '/public'))
 app.use('/api/products',routerProd)
-app.use('/api/carts', routerCart);
+app.use('/api/cart', routerCart);
 app.use('/api/messages', routerMessage)
 app.use('/api/users', routerUser)
 
@@ -110,9 +109,10 @@ app.get('/static', (req, res) => {
 
 })
 
-/*app.post('/upload', upload.single('product'), (req,res) =>{
+app.post('/upload', upload.single('product'), (req,res) =>{
     console.log(req.file)
     console.log(req.body)
+    res.status(200).send("Imagen cargada")
 
 })
 
