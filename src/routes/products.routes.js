@@ -49,7 +49,7 @@ routerProd.post('/', async (req, res) => {
 
 routerProd.put('/:pid', async (req, res) => {
     const {pid} = req.params
-    const {title, description, price, stock, category, status, code} = req.body
+    const {title, description, price, stock, category, code} = req.body
     
     try{
         const respuesta = await productModel.findByIdAndUpdate(pid, {title, description, price, stock, category, status, code})

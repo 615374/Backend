@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {userModel} from "../models/users.model.js"
+import userModel from "../models/users.models.js"
 
 const routerUser = Router()
 
@@ -26,4 +26,4 @@ routerUser.post('/', async(req,res)=> {
     }
 })
 
-export default routerUser
+export default routerUser;

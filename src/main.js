@@ -2,14 +2,16 @@ import express from 'express';
 import multer from 'multer';
 import {engine} from 'express-handlebars';
 import {Server} from 'socket.io';
-import {__dirname} from './path.js'
-import path from 'path'
+import {__dirname} from './path.js';
+import path from 'path';
 import mongoose from 'mongoose';
+import userModel from './models/users.models.js';
+import cartModel from './models/carts.models.js';
+import orderModel from './models/order.js';
 
-
-import routerProd from './routes/products.routes.js'
-import routerCart from './routes/cart.routes.js'
-import routerUser from './routes/users.routes.js'
+import routerProd from './routes/products.routes.js';
+import routerCart from './routes/cart.routes.js';
+import routerUser from './routes/users.routes.js';
 import routerMessage from './routes/messages.routes.js';
 
 
@@ -18,8 +20,33 @@ const app = express()
 const PORT = 4000
 
 mongoose.connect('mongodb+srv://615374:615374nz@615374.ohouqzx.mongodb.net/?retryWrites=true&w=majority')
-.then(() =>  console.log("DB conectada")) 
+.then(async() => {
+    
+    console.log("DB conectada")
+   
+   /*await orderModel.create([
+         {name: 'Remera Trash', size: 'small', price: '8500', quantity: '5'},
+         {name: 'Remera Original Juan', size: 'medium', price: '8700', quantity: '8'},
+         {name: 'Remera Run the jewells', size: 'large', price: '9000', quantity: '3'},
+         {name: 'Remera Biggie', size: 'small', price: '8500', quantity: '4'},
+         {name: 'Remera N.W.A', size: 'medium', price: '8700', quantity: '6'},
+         {name: 'Remera Fugees', size: 'large', price: '9000', quantity: '2'},
+         {name: 'Remera Kase O', size: 'small', price: '8500', quantity: '7'},
+         {name: 'Remera Wu Tang Clan', size: 'medium', price: '8700', quantity: '5'},
+         {name: 'Remera T&K', size: 'large', price: '9000', quantity: '6'},
+   ])*/
+   
+   
+    //const cart = await cartModel.findOne({_id:"650b49efc80ac9f82045735f"}).populate('products.id_prod')
+    //console.log(JSON.stringify(cart))
+    //await cartModel.create({})
+}) 
 .catch((error) => console.log("Error en conexion a MongoDB Atlas: ", error))
+
+
+
+//const resultados = await userModel.find({nombre: 'Ofelio'}).explain('executionStats')
+//console.log(resultados)
 
 
 //Server
@@ -88,7 +115,7 @@ io.on("connection", (socket) => {
 //Routes
 app.use('/static', express.static(__dirname + '/public'))
 app.use('/api/products',routerProd)
-app.use('/api/cart', routerCart);
+app.use('/api/carts', routerCart);
 app.use('/api/messages', routerMessage)
 app.use('/api/users', routerUser)
 

@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import cartModel from '../models/carts.models.js';
+import cartModel from "../models/carts.models.js";
 
 
 const routerCart = Router();
@@ -21,5 +21,5 @@ routerCart.post('/:cid/products/:pid', async (req, res) => {
     }
 })
 
-export default routerCart
+export default routerCart;
 
