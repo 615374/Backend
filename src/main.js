@@ -5,9 +5,8 @@ import {Server} from 'socket.io';
 import {__dirname} from './path.js';
 import path from 'path';
 import mongoose from 'mongoose';
-import userModel from './models/users.models.js';
-import cartModel from './models/carts.models.js';
-import orderModel from './models/order.js';
+
+import orderModel from './models/order.models.js';
 
 import routerProd from './routes/products.routes.js';
 import routerCart from './routes/cart.routes.js';
@@ -23,7 +22,9 @@ mongoose.connect('mongodb+srv://615374:615374nz@615374.ohouqzx.mongodb.net/?retr
 .then(async() => {
     
     console.log("DB conectada")
-   
+   const resultados = await orderModel.paginate({status: 'small'}, {limit: 1, page: 4, sort: 'asc'})
+   console.log(resultados)
+
    /*await orderModel.create([
          {name: 'Remera Trash', size: 'small', price: '8500', quantity: '5'},
          {name: 'Remera Original Juan', size: 'medium', price: '8700', quantity: '8'},
@@ -36,17 +37,13 @@ mongoose.connect('mongodb+srv://615374:615374nz@615374.ohouqzx.mongodb.net/?retr
          {name: 'Remera T&K', size: 'large', price: '9000', quantity: '6'},
    ])*/
    
+
    
     //const cart = await cartModel.findOne({_id:"650b49efc80ac9f82045735f"}).populate('products.id_prod')
     //console.log(JSON.stringify(cart))
     //await cartModel.create({})
 }) 
 .catch((error) => console.log("Error en conexion a MongoDB Atlas: ", error))
-
-
-
-//const resultados = await userModel.find({nombre: 'Ofelio'}).explain('executionStats')
-//console.log(resultados)
 
 
 //Server
@@ -75,14 +72,7 @@ app.use(express.urlencoded({extended: true}));
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.set('views', path.resolve(__dirname, './views'))
-/*app.use(cookieParser(process.env.SIGNED_COOKIE))
-app.use(session({
-    secret: process.env.SIGNED_COOKIE,
-    resave: true,
-    saveUnitialized: true
-}))
 
-*/
 
 const upload = multer ({storage: storage})
 const mensajes = []
@@ -91,25 +81,12 @@ const mensajes = []
 io.on("connection", (socket) => {
     console.log("Conexion con Socket.io")
 
-    socket.on('mensaje', info => {
-        console.log(info)
-        mensajes.push(info)
-        io.emit('mensajes', mensajes)
+    socket.on('load', async () => {
        
-    })
-
-   /* socket.on('load', async () => {
-        //Deberia agregarse al txt o json mediante addProduct
         const data = await productModel.paginate({}, {limit: 5});
-        if (confirmacion)
-            socket.emit("mensajeProductoCreado", "El producto se creo correctamente")
-        else
-            socket.emit("mensajeProductoCreado","El producto ya existe")
-    })*/
-
-
+        socket.emit('products', data)
+    })
 })
-
 
 
 //Routes
@@ -121,20 +98,27 @@ app.use('/api/users', routerUser)
 
 app.get('/static', (req, res) => {
     // Indica que plantilla voy a utilizar
-   
-    /*res.render("realTimeProducts", {
-        rutaCSS: "realTimeProducts",
-        rutaJS: "realTimeProducts",
-    })*/
+    res.render('index', {
+		rutaCSS: 'index',
+		rutaJS: 'index',
+	});
+});
 
-    res.render ("chat", {
-        rutaJS: "chat",
-        rutaCSS:"style"
-    })
+app.get('/static/realtimeproducts', (req, res) => {
+ 
+    res.render('realTimeProducts', {
+        rutaCSS: 'realTimeProducts',
+        rutaJS: 'realTimeProducts',
+    });
 
+});
 
-
-})
+app.get('/static/chat', (req, res) => {
+    res.render ('chat', {
+        rutaCSS:'chat',
+        rutaJS: 'chat'   
+    });
+});
 
 app.post('/upload', upload.single('product'), (req,res) =>{
     console.log(req.file)
@@ -163,11 +147,19 @@ app.get('/getCookie', (req, res)=>{
     if(req.session.counter){
         req.session.counter++
         res.send(`Has entrado ${req.session.counter}`)
+    } else {
+        req.session.counter = 1
+        res.send("Hola, por primera vez")
     }
 })
 
 app.get('/logout', (req,res) =>{
-    req.session.destroy((error)=>{})
+    req.session.destroy((error)=>{
+         if (error)
+            console.log(error)
+        else
+            res.redirect('/')
+    })
 })
 
 */

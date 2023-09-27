@@ -4,7 +4,7 @@ import productModel from "../models/products.models.js";
 const routerProd = Router();
 
 routerProd.get('/', async (req, res) => {
-    const {limit} = req.body
+    const {limit, page, sort, category, status} = req.body
     try{
         const prods = await productModel.find().limit(limit)
         res.status(200).send({resultado: 'OK', message: prods})
@@ -22,7 +22,7 @@ routerProd.get('/:pid', async (req, res) => {
         if(prod)
             res.status(200).send({resultado: 'OK', message: prod})
         else
-            res.status(404).send({resultado: 'Not Found', message: prod})
+            res.status(404).send({resultado: 'Producto no encontrado', message: prod})
     } catch (error) {
         res.status(400).send({error: `Error al consultar productos: ${error}`})
     
@@ -56,7 +56,7 @@ routerProd.put('/:pid', async (req, res) => {
         if (prod)
            res.status(200).send({resultado: 'OK', message: respuesta})
         else
-           res.status(404).send({ resultado: 'Not Found', message: respuesta})
+           res.status(404).send({ resultado: 'Producto no encontrado', message: respuesta})
     } catch (error) {
         res.status(400).send({error: `Error al actualizar producto: ${error}`})
     
@@ -72,7 +72,7 @@ routerProd.delete('/:pid', async (req, res) => {
         if (prod)
            res.status(200).send({resultado: 'OK', message: respuesta})
         else
-           res.status(404).send({ resultado: 'Not Found', message: respuesta})
+           res.status(404).send({ resultado: 'Producto no encontrado', message: respuesta})
     } catch (error) {
         res.status(400).send({error: `Error al eliminar producto: ${error}`})
     
