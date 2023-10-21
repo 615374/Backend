@@ -1,3 +1,4 @@
+import 'dotenv/config'; //Permite usar variables de entorno
 import express from 'express';
 import multer from 'multer';
 import {engine} from 'express-handlebars';
@@ -5,43 +6,25 @@ import {Server} from 'socket.io';
 import {__dirname} from './path.js';
 import path from 'path';
 import mongoose from 'mongoose';
-
+import cookieParser from 'cookie-parser';
 import orderModel from './models/order.models.js';
+import session from 'express-session';
 
 import routerProd from './routes/products.routes.js';
 import routerCart from './routes/cart.routes.js';
 import routerUser from './routes/users.routes.js';
 import routerMessage from './routes/messages.routes.js';
-
+import routerSessions from './routes/sessions.routes.js';
+import MongoStore from 'connect-mongo';
 
 
 const app = express()
 const PORT = 4000
 
-mongoose.connect('mongodb+srv://615374:615374nz@615374.ohouqzx.mongodb.net/?retryWrites=true&w=majority')
+mongoose.connect(process.env.MONGO_URL)
 .then(async() => {
-    
     console.log("DB conectada")
-   const resultados = await orderModel.paginate({status: 'small'}, {limit: 1, page: 4, sort: 'asc'})
-   console.log(resultados)
-
-   /*await orderModel.create([
-         {name: 'Remera Trash', size: 'small', price: '8500', quantity: '5'},
-         {name: 'Remera Original Juan', size: 'medium', price: '8700', quantity: '8'},
-         {name: 'Remera Run the jewells', size: 'large', price: '9000', quantity: '3'},
-         {name: 'Remera Biggie', size: 'small', price: '8500', quantity: '4'},
-         {name: 'Remera N.W.A', size: 'medium', price: '8700', quantity: '6'},
-         {name: 'Remera Fugees', size: 'large', price: '9000', quantity: '2'},
-         {name: 'Remera Kase O', size: 'small', price: '8500', quantity: '7'},
-         {name: 'Remera Wu Tang Clan', size: 'medium', price: '8700', quantity: '5'},
-         {name: 'Remera T&K', size: 'large', price: '9000', quantity: '6'},
-   ])*/
-   
-
-   
-    //const cart = await cartModel.findOne({_id:"650b49efc80ac9f82045735f"}).populate('products.id_prod')
-    //console.log(JSON.stringify(cart))
-    //await cartModel.create({})
+ 
 }) 
 .catch((error) => console.log("Error en conexion a MongoDB Atlas: ", error))
 
@@ -69,6 +52,28 @@ const storage = multer.diskStorage({
 //Middlewares
 app.use(express.json())
 app.use(express.urlencoded({extended: true}));
+app.use(cookieParser(process.env.SIGNED_COOKIE)) // Firmo la cookie
+app.use(session({
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_URL,
+        mongoOptions: {useNewUrlParser: true, useUnifiedTopology: true},
+        ttl: 90
+    }),
+
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true
+}))
+
+function auth(req,res,next){
+    console.log(req.session.email)
+
+    if(req.session.email == "admin@admin.com") {
+        return next() //Continua con la ejecucion normal de la ruta
+    }
+    return res.send("No tenes acceso a este contenido")
+}
+
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.set('views', path.resolve(__dirname, './views'))
@@ -95,6 +100,7 @@ app.use('/api/products',routerProd)
 app.use('/api/carts', routerCart);
 app.use('/api/messages', routerMessage)
 app.use('/api/users', routerUser)
+app.use('/api/sessions', routerSessions)
 
 app.get('/static', (req, res) => {
     // Indica que plantilla voy a utilizar
@@ -130,8 +136,9 @@ app.post('/upload', upload.single('product'), (req,res) =>{
 
 //Cookies
 
-/*app.get('/setCookie', (req,res) =>{
-    res.cookie('CookieCookie', 'Esto es el valor de una cookie', {maxAge:30000, signed: true}).send('Cookie creada') //Cookie de un minuto firmada
+app.get('/setCookie', (req,res) =>{
+    res.cookie('CookieCookie', 'Esto es el valor de una cookie', 
+    {maxAge:30000, signed: true}).send('Cookie creada') //Cookie de un minuto firmada
 })
 
 app.get('/getCookie', (req, res)=>{
@@ -139,19 +146,35 @@ app.get('/getCookie', (req, res)=>{
     
 })
 
-*/
+
 
 //Sessions
 
-/*app.get('/session', (req, res) =>{
-    if(req.session.counter){
+app.get('/session', (req, res) =>{
+    if(req.session.counter){ //Si existe la variable counter en la session
         req.session.counter++
-        res.send(`Has entrado ${req.session.counter}`)
+        res.send(`Has entrado ${req.session.counter} veces a mi pagina`)
     } else {
         req.session.counter = 1
         res.send("Hola, por primera vez")
     }
 })
+
+app.get('/login', (req,res)=>{
+    const {email, password} = req.body
+    
+        req.session.email = email
+        req.session.password = password
+        return res.send("Usuario logueado")
+   
+return res.send("Login fallido")   
+})
+
+
+app.get('/admin', auth, (req, res) =>{
+    res.send("Sos admin")
+})
+
 
 app.get('/logout', (req,res) =>{
     req.session.destroy((error)=>{
@@ -162,4 +185,3 @@ app.get('/logout', (req,res) =>{
     })
 })
 
-*/
