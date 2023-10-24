@@ -1,7 +1,8 @@
 import { Router } from "express";
 import userModel from "../models/users.models.js";
+import {validatePassword} from "../utils/bcrypt.js";
 
-const routerSessions = Router()
+const routerSessions = Router() 
 
 routerSessions.post('/login', async (req, res) => {
     const { email, password } = req.body
@@ -12,7 +13,7 @@ routerSessions.post('/login', async (req, res) => {
         const user = await userModel.findOne({ email: email })
 
         if (user) {
-            if (user.password == password) {
+            if (validatePassword(password, user.password)) {
                 req.session.login = true
                 res.status(200).send({ resultado: 'Login valido', message: user })
                 //res.redirect('ruta', 200, {'info': user}) Redireccion
