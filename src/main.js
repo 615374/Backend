@@ -9,13 +9,16 @@ import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import orderModel from './models/order.models.js';
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
+import passport from 'passport'
+import initializePassport from './config/passport.js';
 
 import routerProd from './routes/products.routes.js';
 import routerCart from './routes/cart.routes.js';
 import routerUser from './routes/users.routes.js';
 import routerMessage from './routes/messages.routes.js';
 import routerSessions from './routes/sessions.routes.js';
-import MongoStore from 'connect-mongo';
+
 
 
 const app = express()
@@ -57,7 +60,7 @@ app.use(session({
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URL,
         mongoOptions: {useNewUrlParser: true, useUnifiedTopology: true},
-        ttl: 90
+        ttl: 60
     }),
 
     secret: process.env.SESSION_SECRET,
@@ -65,10 +68,15 @@ app.use(session({
     saveUninitialized: true
 }))
 
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
+
 function auth(req,res,next){
     console.log(req.session.email)
 
-    if(req.session.email == "admin@admin.com") {
+    if(req.session.email == "admin@admin.com" && req.session.password == "1234") { 
         return next() //Continua con la ejecucion normal de la ruta
     }
     return res.send("No tenes acceso a este contenido")
