@@ -1,5 +1,6 @@
 import 'dotenv/config'; //Permite usar variables de entorno
 import express from 'express';
+import router from './routes/index.routes.js'
 import multer from 'multer';
 import {engine} from 'express-handlebars';
 import {Server} from 'socket.io';
@@ -13,11 +14,7 @@ import MongoStore from 'connect-mongo';
 import passport from 'passport'
 import initializePassport from './config/passport.js';
 
-import routerProd from './routes/products.routes.js';
-import routerCart from './routes/cart.routes.js';
-import routerUser from './routes/users.routes.js';
-import routerMessage from './routes/messages.routes.js';
-import routerSessions from './routes/sessions.routes.js';
+
 
 
 
@@ -103,12 +100,8 @@ io.on("connection", (socket) => {
 
 
 //Routes
-app.use('/static', express.static(__dirname + '/public'))
-app.use('/api/products',routerProd)
-app.use('/api/carts', routerCart);
-app.use('/api/messages', routerMessage)
-app.use('/api/users', routerUser)
-app.use('/api/sessions', routerSessions)
+app.use('/static', router)
+
 
 app.get('/static', (req, res) => {
     // Indica que plantilla voy a utilizar
@@ -153,7 +146,6 @@ app.get('/getCookie', (req, res)=>{
     res.send(req.signedCookies) //Consultar solo las cookies firmadas
     
 })
-
 
 
 //Sessions

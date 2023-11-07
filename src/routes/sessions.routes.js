@@ -49,6 +49,16 @@ routerSessions.post('/login', passport.authenticate('login'), async (req, res) =
     }
 })
 
+routerSessions.get('/testJWT', passport.authenticate('jwt', { session: true }), async (req, res) => {
+    res.status(200).send({ mensaje: req.user })
+    req.session.user = {
+        first_name: req.user.user.first_name,
+        last_name: req.user.user.last_name,
+        age: req.user.user.age,
+        email: req.user.user.email
+    }
+})
+
 routerSessions.get('/github', passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => {
     res.status(200).send({ mensaje: 'Usuario creado' })
 })
