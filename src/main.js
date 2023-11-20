@@ -15,8 +15,6 @@ import initializePassport from './config/passport.js';
 
 
 
-
-
 const app = express()
 const PORT = 4000
 
