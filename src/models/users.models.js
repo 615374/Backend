@@ -22,8 +22,11 @@ const userSchema = new Schema({
     age:{
         type: Number,
         required: true
+    },
+    rol: {
+        type: String,
+        default: 'user'
     }
-    
 })
 
 const userModel = model('users', userSchema)

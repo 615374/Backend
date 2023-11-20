@@ -6,11 +6,10 @@ import {engine} from 'express-handlebars';
 import {Server} from 'socket.io';
 import {__dirname} from './path.js';
 import path from 'path';
-import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
-import orderModel from './models/order.models.js';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import mongoose from 'mongoose';
 import passport from 'passport'
 import initializePassport from './config/passport.js';
 
@@ -52,7 +51,7 @@ const storage = multer.diskStorage({
 //Middlewares
 app.use(express.json())
 app.use(express.urlencoded({extended: true}));
-app.use(cookieParser(process.env.SIGNED_COOKIE)) // Firmo la cookie
+app.use(cookieParser(process.env.JWT_SECRET)) // Firmo la cookie
 app.use(session({
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URL,
@@ -60,7 +59,7 @@ app.use(session({
         ttl: 60
     }),
 
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.JWT_SECRET,
     resave: true,
     saveUninitialized: true
 }))
@@ -100,7 +99,7 @@ io.on("connection", (socket) => {
 
 
 //Routes
-app.use('/static', router)
+app.use('/', router)
 
 
 app.get('/static', (req, res) => {

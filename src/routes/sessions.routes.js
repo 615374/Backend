@@ -1,34 +1,10 @@
 import { Router } from "express";
-import userModel from "../models/users.models.js";
-import {validatePassword} from "../utils/bcrypt.js";
+import { passportError, authorization } from "../utils/messageErrors.js";
+import { generateToken } from "../utils/jwt.js";
 import passport from "passport";
 
 const routerSessions = Router() 
 
-/*
-routerSessions.post('/login', async (req, res) => {
-    const { email, password } = req.body
-
-    try {
-        if (req.session.login)
-            res.status(200).send({ resultado: 'Login ya existente' })
-        const user = await userModel.findOne({ email: email })
-
-        if (user) {
-            if (validatePassword(password, user.password)) {
-                req.session.login = true
-                res.status(200).send({ resultado: 'Login valido', message: user })
-                //res.redirect('ruta', 200, {'info': user}) Redireccion
-            } else {
-                res.status(401).send({ resultado: 'Unauthorized', message: user })
-            }
-        } else {
-            res.status(404).send({ resultado: 'Not Found', message: user })
-        }
-    } catch (error) {
-        res.status(400).send({ error: `Error en login: ${error}` })
-    }
-}) */
 
 routerSessions.post('/login', passport.authenticate('login'), async (req, res) => {
     try {
@@ -43,20 +19,32 @@ routerSessions.post('/login', passport.authenticate('login'), async (req, res) =
             email: req.user.email
         }
 
+        const token = generateToken(req.user)
+        res.cookie('jwtCookie', token, {
+            maxAge: 43200000
+        })
+
         res.status(200).send({ payload: req.user })
     } catch (error) {
         res.status(500).send({ mensaje: `Error al iniciar sesion ${error}` })
     }
 })
 
-routerSessions.get('/testJWT', passport.authenticate('jwt', { session: true }), async (req, res) => {
+routerSessions.get('/testJWT', passport.authenticate('jwt', { session: true }), 
+async (req, res) => {
     res.status(200).send({ mensaje: req.user })
+  
     req.session.user = {
         first_name: req.user.user.first_name,
         last_name: req.user.user.last_name,
         age: req.user.user.age,
         email: req.user.user.email
     }
+
+})
+
+routerSessions.get('/current', passportError('jwt'), authorization('user'), (req, res) => {
+    res.send(req.user)
 })
 
 routerSessions.get('/github', passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => {

@@ -1,17 +1,44 @@
 import local from 'passport-local' //Estrategia
 import passport from 'passport' //Manejador de las estrategias
 import GithubStrategy from 'passport-github2'
+import jwt from 'passport-jwt'
 import { createHash, validatePassword } from '../utils/bcrypt.js'
 import  userModel from '../models/users.models.js'
 
 const LocalStrategy = local.Strategy
+const JWTStrategy = jwt.Strategy
+const ExtractJWT = jwt.ExtractJwt  //Extractor de los headers de la consulta
 
 const initializePassport = () => {
+    
+    const cookieExtractor = req => {
+        console.log(req.cookies)
+        //{} no hay cookies != no exista mi cookie
+        //Si existen cookies, consulte por mi cookie y sino asigno {}
+        const token = req.cookies ? req.cookies.jwtCookie : {}
+        console.log(token)
+        return token
+    }
+
+    passport.use('jwt', new JWTStrategy({
+        jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]), //Consulto el token de las cookies
+        secretOrKey: process.env.JWT_SECRET
+    }, async (jwt_payload, done) => {
+        try {
+            console.log(jwt_payload)
+            return done(null, jwt_payload) //Retorno el contenido del token
+        } catch (error) {
+            return done(error)
+        }
+
+    }))
+
+
     //done es como si fuera un res.status(), el callback de respuesta
     passport.use('register', new LocalStrategy(
     { passReqToCallback: true, usernameField: 'email' }, async (req, username, password, done) => {
     //Defino como voy a registrar un user
-    const { first_name, last_name, email, age } = req.body
+    const { first_name, last_name, email, age, rol } = req.body
 
     try {
                 const user = await userModel.findOne({ email: email })
@@ -25,7 +52,8 @@ const initializePassport = () => {
                     last_name: last_name,
                     email: email,
                     age: age,
-                    password: passwordHash
+                    password: passwordHash,
+                    rol: user
                 })
                 console.log(userCreated)
                 return done(null, userCreated)
@@ -74,7 +102,8 @@ const initializePassport = () => {
                     last_name: '  ',
                     email: profile._json.email,
                     age: 18, //Edad por defecto,
-                    password: 'password'
+                    password: 'password',
+                    rol: user
                 })
                 done(null, userCreated)
 
