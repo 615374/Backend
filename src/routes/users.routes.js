@@ -1,25 +1,11 @@
-import {Router} from "express";
-import userModel from "../models/users.models.js"
+import { Router } from 'express';
+import passport from 'passport';
+import usersController from '../controllers/users.controller.js';
 
-const routerUser = Router()
+const routerUser = Router();
 
+routerUser.post('/', passport.authenticate('register'), usersController.postUser);
 
-routerUser.post('/', async(req,res)=> {
-    const { first_name, last_name, email, password, age } = req.body
-    try {
-        const response = await userModel.create({ 
-            first_name: first_name, 
-            last_name: last_name, 
-            email: email, 
-            password: hashPassword, 
-            age:age 
-        })
-        res.status(200).send({ mensaje: 'Usuario creado', respuesta: response })
-    } catch (error) {
-        const hashPassword = createHash(password)
-        res.status(400).send({ error: `Error en create user: ${error}` })
-    }
-
-})
+routerUser.get('/', usersController.getUser);
 
 export default routerUser;
