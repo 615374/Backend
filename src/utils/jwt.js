@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 
 export const generateToken = (user) => {
 
-    const token = jwt.sign({ user }, "coderhouse123", { expiresIn: '12h' })
+    const token = jwt.sign({ user }, process.env.JWT_SECRET, { expiresIn: '12h' })
     return token
 }
 
@@ -11,7 +11,7 @@ console.log(generateToken({ "_id": "650cc75f82d8d6a40adf8ba4", "first_name": "Gi
 
 export const authToken = (req, res, next) => {
     //Consulto el header
-    const authHeader = req.headers.Authorization //Consulto si existe el token
+    const authHeader = req.cookies.jwtCookie;//Consulto si existe el token
     if (!authHeader) {
         return res.status(401).send({ error: 'Usuario no autenticado' })
     }
