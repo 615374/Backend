@@ -97,6 +97,7 @@ export const putProduct = async (req, res) => {
 		});
 	}
    
+
     try {
         const product = await productModel.findByIdAndUpdate(id, { title, description, code, price, stock, category })
 
