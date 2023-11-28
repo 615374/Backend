@@ -52,7 +52,8 @@ components:
         type: String
         description: Titulo del producto
        description: 
-         type: String Descripcion del producto
+        type: String 
+        description: Descripcion del producto
        price:
         type: Number
         description: Precio del producto
