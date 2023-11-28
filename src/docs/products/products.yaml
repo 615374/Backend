@@ -1,0 +1,82 @@
+paths:
+  /api/products/:
+    get:
+      summary: Obtener todos los productos
+      tags: 
+        - Products
+      responses:
+        '200':
+          description: Productos obtenidos satisfactoriamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Products'
+        '500':
+          description: Error interno del servidor al obtener los productos
+ 
+ 
+  /api/products/{id}:
+    get:
+      summary: Obtener un solo producto dado su id
+      tags: 
+        - Product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: 
+            $type: String
+          description: Id del producto a buscar
+      responses:
+        '200':
+          description: Producto obtenido satisfactoriamente
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Products'
+        '500':
+          description: Error interno del servidor al obtener el producto
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+       _id: 
+        type: ObjectId
+        description: Id autogenerado de MongoDB
+       title: 
+        type: String
+        description: Titulo del producto
+       description: 
+         type: String Descripcion del producto
+       price:
+        type: Number
+        description: Precio del producto
+       stock: 
+        type: Number
+        description: Stock del producto
+       category: 
+        type: String
+        descritption: Categoria del producto
+       status: 
+        type: Boolean
+        description: Estado del producto
+       code:
+        type: String,
+        descripcion: Codigo del producto
+      
+       thumbnails:
+        type: Array
+      example:
+        _id: ObjectId('31a3123f2313e')
+        title: Reloj
+        descritption: Reloj pulsera
+        price: 5000
+        stock: 3
+        category: Silver
+        status: 1
+        code: 59684

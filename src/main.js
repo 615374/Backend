@@ -12,6 +12,9 @@ import MongoStore from 'connect-mongo';
 import mongoose from 'mongoose';
 import passport from 'passport'
 import initializePassport from './config/passport.js';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUiExpress from 'swagger-ui-express'
+
 
 
 
@@ -44,6 +47,25 @@ const storage = multer.diskStorage({
         cb(null, `${Date.now()}${file.originalname}`) //concateno la fecha actual con el nombre del archivo
     }
 }) 
+
+
+//Swagger
+
+const swaggerOptions = {
+    definition: {
+        openapi: '3.1.0',
+        info: {
+            title: 'Documentacion del curso de Backend',
+            decription: 'API Coderhouse Backend'
+        }
+    },
+    apis: [`${__dirname}/docs/**/*.yaml`]
+}
+
+console.log(__dirname)
+
+const specs = swaggerJSDoc(swaggerOptions)
+app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs))
 
 
 //Middlewares
