@@ -14,7 +14,7 @@ import passport from 'passport'
 import initializePassport from './config/passport.js';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUiExpress from 'swagger-ui-express'
-
+import errorHandler from './middlewares/errors/index.js'
 
 
 
@@ -83,6 +83,8 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }))
+
+app.use(errorHandler);
 
 initializePassport()
 app.use(passport.initialize())
