@@ -3,16 +3,17 @@ import CustomError from "../services/errors/customError.js";
 import EErrors from '../services/errors/enums.js';
 
 const postUser = async (req, res, next) => {
-    const { first_name, last_name, email, age } = req.body
+    const { first_name, last_name, email, age } = req.body;
     if (!last_name || !first_name || !email) {
-		CustomError.createError({
+        const error = CustomError.createError({
             name: "Error de creacion de usuario",
             cause: generateUserErrorInfo({ first_name, last_name, email }),
             message: "Una o mas propiedades estan incompletas o son invalidas",
             code: EErrors.MISSING_OR_INVALID_USER_DATA
         });
-        return res.status(400).send({ mensaje: 'Usuario existente' });
-	}
+       
+        return next(error);
+    }
     res.status(200).send({ mensaje: 'Usuario creado' });
 };
 

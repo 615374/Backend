@@ -19,7 +19,7 @@ import errorHandler from './middlewares/errors/index.js'
 
 
 const app = express()
-const PORT = 4000
+const PORT = 8080
 
 mongoose.connect(process.env.MONGO_URL)
 .then(async() => {
@@ -84,7 +84,6 @@ app.use(session({
     saveUninitialized: true
 }))
 
-app.use(errorHandler);
 
 initializePassport()
 app.use(passport.initialize())
@@ -123,6 +122,7 @@ io.on("connection", (socket) => {
 //Routes
 app.use('/', router)
 
+app.use(errorHandler);
 
 app.get('/static', (req, res) => {
     // Indica que plantilla voy a utilizar
