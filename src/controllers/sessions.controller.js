@@ -20,7 +20,7 @@ const postSession = async (req, res) => {
 			maxAge: 43200000, // seteamos que dure 12 hs en milisegundos
 		});
 
-		return res.redirect('../../static/products');
+		res.json({token});
 	} catch (error) {
 		res.status(500).send({ mensaje: `Error al iniciar sesión ${error}` });
 	}

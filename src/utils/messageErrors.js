@@ -19,18 +19,24 @@ export const passportError = (strategy) => {
 
 //Ingreso un rol y verifico si mi usuario lo cumple (ej; ingreso admin y veo si mi user es admin o no)
 export const authorization = (rol) => {
-
+    let checkRolFunction = null;
+    if (Array.isArray(rol)){
+      checkRolFunction = (rolToCheck) => rol.includes(rolToCheck) 
+    } else {
+      checkRolFunction = (rolToCheck) => rol === rolToCheck
+    }
     return async (req, res, next) => {
         //Se vuelve a consultar si el usuario existe dado que: el token puede expirar, el user borrar el historial o se rompe la compu
         if (!req.user) {
             return res.status(401).send({ error: 'User no autorizado' })
         }
 
-        if (req.user.user.rol != rol) { //Si mi usuario tiene un rol distinto al ingresado como parametro
-            return res.status(403).send({ error: 'User no tiene los privilegios necesarios' })
-        }
+        const isAuthorized = rols.find(rol => rol == req.user.user.rol);
+		if (!isAuthorized) {
+			return res.status(403).send({ error: 'User no tiene los privilegios necesarios' });
+		}
 
-        next()
+		next();
     }
 
 }

@@ -9,14 +9,14 @@ const postUser = async (req, res, next) => {
     const { first_name, last_name, email, age } = req.body;
     try {
       if (!last_name || !first_name || !email) {
-        throw CustomError.createError({
+        CustomError.createError({
             name: "Error de creacion de usuario",
             cause: generateUserErrorInfo({ first_name, last_name, email }),
             message: "Una o mas propiedades estan incompletas o son invalidas",
             code: EErrors.MISSING_OR_INVALID_USER_DATA
         });
     }   
-    
+
     res.status(200).send({ mensaje: 'Usuario creado' });
     } catch (error){
         next(error);

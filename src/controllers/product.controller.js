@@ -48,32 +48,32 @@ export const getProduct = async (req, res) => {
 export const postProduct = async (req, res, next) => {
     const { title, description, code, price, stock, category } = req.body;
 
-    if (!title || !description || !code || !price || !stock || !category) {
-        CustomError.createError({
-            name: 'Error de creación de producto',
-            cause: generateProductErrorInfo({ title, description, code, price, stock, category }),
-            message: 'Error al crear producto',
-            code: EErrors.MISSING_OR_INVALID_PRODUCT_DATA,
-        });
-
-    }
-    
     try {
+        if (!title || !description || !code || !price || !stock || !category) {
+            CustomError.createError({
+                name: 'Error de creación de producto',
+                cause: generateProductErrorInfo({ title, description, code, price, stock, category }),
+                message: 'Error al crear producto',
+                code: EErrors.MISSING_OR_INVALID_PRODUCT_DATA,
+            });
+    
+        }
+        
         const product = await productModel.create({ title, description, code, price, stock, category });
-
+        
         if (product) {
             return res.status(201).send(product);
         }
 
     } catch (error) {
+        
         if (error.code == 11000) {
-			res.status(400).send({ error: `Llave duplicada` });
+			return res.status(400).send({ error: `Llave duplicada` });
 		}
-        return next(error);
+        next(error);
            
     } 
 };
-
 export const putProduct = async (req, res, next) => {
     const { id } = req.params;
     const { title, description, code, price, stock, category } = req.body;
