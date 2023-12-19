@@ -5,9 +5,9 @@ import sessionController from '../controllers/sessions.controller.js';
 
 const routerSessions = Router() 
 
-routerSessions.post('/login', passport.authenticate('login'), sessionController.postSession);
+routerSessions.post('/login', sessionController.postSession, passport.authenticate('login'));
 
-routerSessions.get('/current', passportError('jwt'), sessionController.getCurrentSession);
+routerSessions.get('/current', sessionController.getCurrentSession, passportError('jwt'));
 
 routerSessions.get(
 	'/github',

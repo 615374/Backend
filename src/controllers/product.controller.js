@@ -49,16 +49,15 @@ export const postProduct = async (req, res, next) => {
     const { title, description, code, price, stock, category } = req.body;
 
     if (!title || !description || !code || !price || !stock || !category) {
-        const error = CustomError.createError({
+        CustomError.createError({
             name: 'Error de creación de producto',
             cause: generateProductErrorInfo({ title, description, code, price, stock, category }),
             message: 'Error al crear producto',
             code: EErrors.MISSING_OR_INVALID_PRODUCT_DATA,
         });
 
-        return next(error);
     }
-
+    
     try {
         const product = await productModel.create({ title, description, code, price, stock, category });
 
@@ -66,15 +65,13 @@ export const postProduct = async (req, res, next) => {
             return res.status(201).send(product);
         }
 
-        res.status(404).send({ error: "Producto no encontrado" });
-
     } catch (error) {
-        if (error.code === 11000) {
-            return res.status(400).send({ error: `Llave duplicada` });
-        } else {
-            return next(error); 
-        }
-    }
+        if (error.code == 11000) {
+			res.status(400).send({ error: `Llave duplicada` });
+		}
+        return next(error);
+           
+    } 
 };
 
 export const putProduct = async (req, res, next) => {
@@ -82,14 +79,13 @@ export const putProduct = async (req, res, next) => {
     const { title, description, code, price, stock, category } = req.body;
 
     if (!title || !description || !code || !price || !stock || !category) {
-        const error = CustomError.createError({
+        CustomError.createError({
             name: 'Error de actualización de producto',
             cause: generateProductErrorInfo({ title, description, code, price, stock, category }),
             message: 'Error al actualizar producto',
             code: EErrors.MISSING_OR_INVALID_PRODUCT_DATA,
         });
 
-        return next(error);
     }
 
     try {
@@ -99,10 +95,9 @@ export const putProduct = async (req, res, next) => {
             return res.status(200).send(product);
         }
 
-        res.status(404).send({ error: "Producto no encontrado" });
 
     } catch (error) {
-        res.status(500).send({ error: `Error en actualizar producto ${error}` });
+        return next(error)
     }
 };
 

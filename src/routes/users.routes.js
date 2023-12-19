@@ -4,7 +4,7 @@ import usersController from '../controllers/users.controller.js';
 
 const routerUser = Router();
 
-routerUser.post('/', passport.authenticate('register'), usersController.postUser);
+routerUser.post('/', usersController.postUser, passport.authenticate('register'));
 
 routerUser.get('/', usersController.getUser);
 
