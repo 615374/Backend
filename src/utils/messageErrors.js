@@ -31,7 +31,7 @@ export const authorization = (rol) => {
             return res.status(401).send({ error: 'User no autorizado' })
         }
 
-        const isAuthorized = rols.find(rol => rol == req.user.user.rol);
+        const isAuthorized = rol.find(rol => rol == req.user.user.rol);
 		if (!isAuthorized) {
 			return res.status(403).send({ error: 'User no tiene los privilegios necesarios' });
 		}
