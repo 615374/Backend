@@ -15,13 +15,13 @@ import initializePassport from './config/passport.js';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUiExpress from 'swagger-ui-express'
 import errorHandler from './middlewares/errors/index.js'
-
-
+import { addLogger } from './utils/logger.js';
 
 const app = express()
 const PORT = 8080
 
-mongoose.connect(process.env.MONGO_URL)
+mongoose
+.connect(process.env.MONGO_URL)
 .then(async() => {
     console.log("DB conectada")
  
@@ -69,9 +69,19 @@ app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs))
 
 
 //Middlewares
+function auth(req,res,next){
+    console.log(req.session.email)
+
+    if(req.session.email == "admin@admin.com" && req.session.password == "1234") { 
+        return next() //Continua con la ejecucion normal de la ruta
+    }
+    return res.send("No tenes acceso a este contenido")
+}
+
 app.use(express.json())
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser(process.env.JWT_SECRET)) // Firmo la cookie
+app.use(addLogger);
 app.use(session({
     store: MongoStore.create({
         mongoUrl: process.env.MONGO_URL,
@@ -83,25 +93,14 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }))
-
-
-initializePassport()
-app.use(passport.initialize())
-app.use(passport.session())
-
-
-function auth(req,res,next){
-    console.log(req.session.email)
-
-    if(req.session.email == "admin@admin.com" && req.session.password == "1234") { 
-        return next() //Continua con la ejecucion normal de la ruta
-    }
-    return res.send("No tenes acceso a este contenido")
-}
-
 app.engine('handlebars', engine())
 app.set('view engine', 'handlebars')
 app.set('views', path.resolve(__dirname, './views'))
+
+//passport
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 
 const upload = multer ({storage: storage})
@@ -116,6 +115,33 @@ io.on("connection", (socket) => {
         const data = await productModel.paginate({}, {limit: 5});
         socket.emit('products', data)
     })
+
+    socket.on('loadCart', async () => {
+		const cart = await cartModel.findById(cartId).populate('products.id_prod');
+		if (cart) {
+			socket.emit('cartProducts', { products: cart.products, cid: cartId });
+		} else {
+			socket.emit('cartProducts', false);
+		}
+	});
+
+	socket.on('newProduct', async product => {
+		await productModel.create(product);
+		const products = await productModel.find();
+
+		socket.emit('products', products);
+	});
+
+	socket.on('mensaje', async info => {
+		const { email, message } = info;
+		await messageModel.create({
+			email,
+			message,
+		});
+		const messages = await messageModel.find();
+
+		socket.emit('mensajes', messages);
+	});
 })
 
 
@@ -130,22 +156,6 @@ app.get('/static', (req, res) => {
 		rutaCSS: 'index',
 		rutaJS: 'index',
 	});
-});
-
-app.get('/static/realtimeproducts', (req, res) => {
- 
-    res.render('realTimeProducts', {
-        rutaCSS: 'realTimeProducts',
-        rutaJS: 'realTimeProducts',
-    });
-
-});
-
-app.get('/static/chat', (req, res) => {
-    res.render ('chat', {
-        rutaCSS:'chat',
-        rutaJS: 'chat'   
-    });
 });
 
 app.post('/upload', upload.single('product'), (req,res) =>{
