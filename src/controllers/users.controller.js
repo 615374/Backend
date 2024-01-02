@@ -1,6 +1,7 @@
 import userModel from '../models/users.models.js';
 import CustomError from "../services/errors/customError.js";
 import EErrors from '../services/errors/enums.js';
+import { generateUserErrorInfo } from '../services/errors/info.js';
 import mailingController from './mail.controller.js';
 import { createHash, validatePassword } from '../utils/bcrypt.js';
 import crypto from 'crypto';

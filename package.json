@@ -4,6 +4,7 @@
   "main": "main.js",
   "dependencies": {
     "@faker-js/faker": "^8.3.1",
+    "assert": "^2.1.0",
     "bcrypt": "^5.1.1",
     "cluster": "^0.7.7",
     "colors": "^1.4.0",

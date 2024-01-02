@@ -5,10 +5,10 @@ import {passportError, authorization} from "../utils/messageErrors.js"
 const routerProd = Router();
 
 routerProd.get('/', getProducts)
-routerProd.get('/:id', getProduct)
+routerProd.get('/:pid', getProduct)
 routerProd.post('/', passportError('jwt'), authorization(['admin', 'user']), postProduct)
-routerProd.put('/:id', passportError('jwt'), authorization(['admin', 'user']), putProduct)
-routerProd.delete('/:id', passportError('jwt'), authorization(['admin', 'user']), deleteProduct)
+routerProd.put('/:pid', passportError('jwt'), authorization(['admin', 'user']), putProduct)
+routerProd.delete('/:pid', passportError('jwt'), authorization(['admin', 'user']), deleteProduct)
 
 
 

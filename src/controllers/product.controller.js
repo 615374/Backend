@@ -30,7 +30,7 @@ export const getProducts = async (req, res) => {
 }
 
 export const getProduct = async (req, res) => {
-    const { id } = req.params
+    const { pid } = req.params
     try {
         const product = await productModel.findById(id)
 
@@ -62,7 +62,7 @@ export const postProduct = async (req, res, next) => {
         const product = await productModel.create({ title, description, code, price, stock, category });
         
         if (product) {
-            return res.status(201).send(product);
+            return res.status(201).send({ mensaje: 'Producto creado', product: product });
         }
 
     } catch (error) {
@@ -75,7 +75,7 @@ export const postProduct = async (req, res, next) => {
     } 
 };
 export const putProduct = async (req, res, next) => {
-    const { id } = req.params;
+    const { pid } = req.params;
     const { title, description, code, price, stock, category } = req.body;
 
     if (!title || !description || !code || !price || !stock || !category) {
@@ -102,13 +102,13 @@ export const putProduct = async (req, res, next) => {
 };
 
 export const deleteProduct = async (req, res) => {
-    const { id } = req.params
+    const { pid } = req.params
 
     try {
         const product = await productModel.findByIdAndDelete(id)
 
         if (product) {
-            return res.status(200).send(product)
+            return res.status(201).send({ mensaje: 'Producto creado', product: product });
         }
 
         res.status(404).send({ error: "Producto no encontrado" })
