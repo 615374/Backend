@@ -1,4 +1,3 @@
-import 'dotenv/config'; //Permite usar variables de entorno
 import express from 'express';
 import router from './routes/index.routes.js'
 import multer from 'multer';
