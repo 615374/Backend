@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import bcrypt from 'bcrypt'
 
 //Encriptar contrasena 

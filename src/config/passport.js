@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import local from 'passport-local'; // Estrategia
 import passport from 'passport'; // Manejador de las estrategias
 import GithubStrategy from 'passport-github2';
