@@ -1,6 +1,8 @@
 import cartModel from '../models/carts.models.js';
 import productModel from '../models/products.models.js';
+import ticketModel from '../models/tickets.models.js';
 import userModel from '../models/users.models.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const getCarts = async (req, res) => {
 	//traer los carritos
@@ -49,18 +51,29 @@ const purchaseCart = async (req, res) => {
 					await product.save();
 					purchaseItems.push(product.title);
 				}
-			
+				//ticket?info=${amount}
 			});
-			console.log(purchaseItems);
+			if (user.rol === 'premium') {
+				amount *= 0.9;
+			}
 			await cartModel.findByIdAndUpdate(cid, { products: [] });
-			res.redirect(
-				`http://localhost:8080/api/tickets/create?amount=${amount}&email=${email}`
-			);
+
+			const ticket = {
+				code: uuidv4(),
+				amount: amount,
+				purchaser: email,
+			};
+
+			const ticketGenerado = await ticketModel.create(ticket);
+			res.status(201).send({
+				resultado: 'Ticket generado',
+				mensaje: { ticketGenerado, purchaseItems },
+			});
 		} else {
 			res.status(404).send({ resultado: 'Not Found', message: cart });
 		}
 	} catch (error) {
-		res.status(400).send({ error: `Error al consultar carrito: ${error}` });
+		res.status(500).send({ error: `Error al consultar carrito: ${error}` });
 	}
 };
 
@@ -74,7 +87,7 @@ const postCart = async (req, res) => {
 	}
 };
 
-const putProductToCart = async (req, res) => {
+const postProductToCart = async (req, res) => {
 	// agregar producto al carrito
 	const { cid, pid } = req.params;
 
@@ -139,13 +152,13 @@ const putQuantity = async (req, res) => {
 			res.status(404).send({ resultado: 'Cart Not Found', message: cart });
 		}
 	} catch (error) {
-		res.status(500).send({ error: `Error al agregar productos: ${error}` });
+		res.status(400).send({ error: `Error al agregar productos: ${error}` });
 	}
 };
 const putProductsToCart = async (req, res) => {
 	// agregar varios producto al carrito
 	const { cid } = req.params;
-	const { updateProducts } = req.body;
+	const updateProducts = req.body;
 
 	try {
 		const cart = await cartModel.findById(cid);
@@ -211,7 +224,7 @@ const cartsController = {
 	getCart,
 	postCart,
 	putProductsToCart,
-	putProductToCart,
+	postProductToCart,
 	putQuantity,
 	deleteCart,
 	deleteProductFromCart,

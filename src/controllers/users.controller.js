@@ -1,31 +1,11 @@
 import userModel from '../models/users.models.js';
-import CustomError from "../services/errors/customError.js";
-import EErrors from '../services/errors/enums.js';
-import { generateUserErrorInfo } from '../services/errors/info.js';
 import mailingController from './mail.controller.js';
 import { createHash, validatePassword } from '../utils/bcrypt.js';
+
 import crypto from 'crypto';
+import cartModel from '../models/carts.models.js';
 
-const postUser = async (req, res, next) => {
-    const { first_name, last_name, email, age } = req.body;
-    try {
-      if (!last_name || !first_name || !email) {
-        CustomError.createError({
-            name: "Error de creacion de usuario",
-            cause: generateUserErrorInfo({ first_name, last_name, email }),
-            message: "Una o mas propiedades estan incompletas o son invalidas",
-            code: EErrors.MISSING_OR_INVALID_USER_DATA
-        });
-    }   
-
-    res.status(200).send({ mensaje: 'Usuario creado' });
-    } catch (error){
-        next(error);
-    }
-    
-};
-
-const getUser = async (req, res) => {
+const getUsers = async (req, res) => {
 	try {
 		const response = await userModel.find();
 		res.status(200).send(response);
@@ -86,6 +66,8 @@ const deleteUser = async (req, res) => {
 	const { uid } = req.params;
 
 	try {
+		const { cart } = await userModel.findById(uid);
+		await cartModel.findByIdAndDelete(cart);
 		const user = await userModel.findByIdAndDelete(uid);
 		if (user) {
 			return res.status(200).send({ mensaje: 'Usuario eliminado', user: user });
@@ -96,7 +78,6 @@ const deleteUser = async (req, res) => {
 		res.status(500).send({ error: `${uid} Error en eliminar usuario ${error}` });
 	}
 };
-
 
 const uploadDocuments = async (req, res) => {
 	console.log(req.files);
@@ -116,13 +97,38 @@ const uploadDocuments = async (req, res) => {
 		res.status(500).send('Error al cargar archivo');
 	}
 };
+
+const deleteInactiveUsers = async (req, res) => {
+	try {
+		const inactivityLimit = new Date(Date.now() - 172800000);
+		const inactivityUsers = await userModel.find({ last_connection: { $lt: inactivityLimit } });
+
+		if (inactivityUsers.length < 1) {
+			res.status(404).send({ mensaje: 'No hay usuarios inactivos' });
+		} else {
+			for (const user of inactivityUsers) {
+				const { _id, cart } = user;
+				console.log({ id: _id, cart: cart });
+				await cartModel.findByIdAndDelete(cart);
+				await userModel.findByIdAndDelete(_id);
+			}
+			res.status(200).send({
+				resultado: `${inactivityUsers.length} eliminados con éxito`,
+				mensaje: inactivityUsers,
+			});
+		}
+	} catch (error) {
+		res.status(500).send({ resultado: 'Error al eliminar usuarios', mensaje: error });
+	}
+};
+
 const usersController = {
-	getUser,
-	postUser,
+	getUsers,
 	recoveryPassword,
 	resetPassword,
 	deleteUser,
 	uploadDocuments,
+	deleteInactiveUsers,
 };
 
 export default usersController;

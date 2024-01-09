@@ -32,7 +32,7 @@ export const getProducts = async (req, res) => {
 export const getProduct = async (req, res) => {
     const { pid } = req.params
     try {
-        const product = await productModel.findById(id)
+        const product = await productModel.findById(pid)
 
         if (product) {
             return res.status(200).send(product)
@@ -89,10 +89,10 @@ export const putProduct = async (req, res, next) => {
     }
 
     try {
-        const product = await productModel.findByIdAndUpdate(id, { title, description, code, price, stock, category });
+        const product = await productModel.findByIdAndUpdate(pid, { title, description, code, price, stock, category });
 
         if (product) {
-            return res.status(200).send(product);
+            return res.status(200).send({ mensaje: 'Producto actualizado', product: product });
         }
 
 
@@ -105,15 +105,15 @@ export const deleteProduct = async (req, res) => {
     const { pid } = req.params
 
     try {
-        const product = await productModel.findByIdAndDelete(id)
+        const product = await productModel.findByIdAndDelete(pid)
 
         if (product) {
-            return res.status(201).send({ mensaje: 'Producto creado', product: product });
+            return res.status(201).send({ mensaje: 'Producto eliminado', product: product });
         }
 
         res.status(404).send({ error: "Producto no encontrado" })
 
     } catch (error) {
-        res.status(500).send({ error: `Error en eliminar producto ${error}` })
+        res.status(500).send({ error: `Error al eliminar producto ${error}` })
     }
 }

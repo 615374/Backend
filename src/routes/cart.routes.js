@@ -3,33 +3,46 @@ import cartsController from '../controllers/carts.controller.js';
 import { authorization, passportError } from '../utils/messageErrors.js';
 const routerCart = Router();
 
-routerCart.get('/', cartsController.getCarts);
-routerCart.get('/:cid', cartsController.getCart);
-routerCart.post('/:cid/purchase', cartsController.purchaseCart);
-routerCart.post('/', cartsController.postCart);
-routerCart.put(
+routerCart.get('/', cartsController.getCarts); //
+routerCart.get('/:cid', cartsController.getCart); //
+routerCart.post(
+	'/:cid/purchase',
+	passportError('jwt'),
+	authorization(['user', 'premium']),
+	cartsController.purchaseCart
+);
+routerCart.post('/', cartsController.postCart); //
+routerCart.post(
 	'/:cid/product/:pid',
 	passportError('jwt'),
-	authorization('user'),
-	cartsController.putProductToCart
+	authorization(['user', 'premium']),
+	cartsController.postProductToCart
 );
 routerCart.put(
-	'/:cid/products/:pid',
+	'/:cid/product/:pid', //
 	passportError('jwt'),
-	authorization('user'),
+	authorization(['user', 'premium']),
 	cartsController.putQuantity
 );
 routerCart.put(
+	//
 	'/:cid',
 	passportError('jwt'),
-	authorization('user'),
+	authorization(['user', 'premium']),
 	cartsController.putProductsToCart
 );
-routerCart.delete('/:cid', passportError('jwt'), authorization('user'), cartsController.deleteCart);
 routerCart.delete(
-	'/:cid/products/:pid',
+	//
+	'/:cid',
 	passportError('jwt'),
-	authorization('user'),
+	authorization(['user', 'premium']),
+	cartsController.deleteCart
+);
+routerCart.delete(
+	//
+	'/:cid/product/:pid',
+	passportError('jwt'),
+	authorization(['user', 'premium']),
 	cartsController.deleteProductFromCart
 );
 export default routerCart;

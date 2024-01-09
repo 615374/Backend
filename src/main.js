@@ -18,7 +18,7 @@ import errorHandler from './middlewares/errors/index.js'
 import { addLogger } from './utils/logger.js';
 
 const app = express()
-const PORT = 8080
+const PORT = 3000
 
 mongoose
 .connect(process.env.MONGO_URL)
