@@ -3,26 +3,26 @@ import { passportError, authorization } from "../utils/messageErrors.js";
 import passport from "passport";
 import sessionController from '../controllers/sessions.controller.js';
 
-const routerSessions = Router() 
+const routerSession = Router() 
 
-routerSessions.post('/login', passport.authenticate('login'), sessionController.postSession);
+routerSession.post('/login', passport.authenticate('login'), sessionController.postSession);
 
-routerSessions.post('/register', passport.authenticate('register'), sessionController.postRegister);
+routerSession.post('/register', passport.authenticate('register'), sessionController.postRegister);
 
-routerSessions.get('/current', passportError('jwt'), sessionController.getCurrentSession);
+routerSession.get('/current', passportError('jwt'), sessionController.getCurrentSession);
 
-routerSessions.get(
+routerSession.get(
 	'/github',
 	passport.authenticate('github', { scope: ['user: email'] }),
 	sessionController.getGithubCreateUser
 );
 
-routerSessions.get(
+routerSession.get(
 	'/githubSession',
 	passport.authenticate('github'),
 	sessionController.getGithubSession
 );
 
-routerSessions.get('/logout', sessionController.getLogout);
+routerSession.get('/logout', sessionController.getLogout);
 
-export default routerSessions;
+export default routerSession;

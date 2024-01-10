@@ -1,3 +1,14 @@
+nav{
+    display: flex;
+    font-family: 'Blaka', cursive;
+
+}
+
+body {
+	margin: 24px;
+	background-color: black;
+}
+
 main {
 	display: flex;
 	flex-direction: column;
@@ -19,6 +30,8 @@ form {
 	height: 400px;
 	padding: 20px 20px 0 20px;
 	border: 1px solid black;
+	background-color: black;
+	
 }
 
 form input {
@@ -30,3 +43,25 @@ form button {
 	width: 150px;
 	height: 40px;
 }
+
+
+footer{
+    padding: 40x 20px;
+    margin-bottom: 0;
+    margin-top: 160px;
+    margin-top: auto;
+    margin-bottom: 0;
+}
+
+button{
+    cursor: pointer;
+}
+
+.copyright{
+  
+    margin-block-end: 2cm; 
+    align-items: flex-end;   
+    margin-left: 50rem;
+    font-family: 'Blaka', cursive;
+    color: rgb(147, 147, 147);
+ }
